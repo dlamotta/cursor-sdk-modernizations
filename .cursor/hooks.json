@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "node -e 'const i=JSON.parse(require(\"fs\").readFileSync(0,\"utf8\")); const cmd=String(i.command||\"\"); const cwd=i.cwd||process.cwd(); let b=\"\"; try { b=require(\"child_process\").execSync(\"git rev-parse --abbrev-ref HEAD\",{cwd,encoding:\"utf8\"}).trim(); } catch (e) {} const onMain=b===\"main\"||b===\"master\"; const c=cmd.toLowerCase(); const commitLike=/\\b(commit|merge|push|rebase|reset)\\b/.test(c); const toMain=/\\b(checkout|switch)\\s+(--\\S+\\s+)*main\\b/.test(c)||/\\b(checkout|switch)\\s+(-b|-c|--create)\\s+main\\b/.test(c); const pushMain=/\\bpush\\b/.test(c)&&/(:main\\b|\\bmain\\b)/.test(c); const deny=(onMain&&commitLike)||toMain||pushMain; const m=deny?\"fail-closed: would commit, merge, or push to main\":\"\"; process.stdout.write(JSON.stringify({permission:deny?\"deny\":\"allow\",user_message:m,agent_message:m}));'",
+        "failClosed": true,
+        "matcher": "git"
+      }
+    ]
+  }
+}
