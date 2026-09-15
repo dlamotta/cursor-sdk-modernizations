@@ -21,8 +21,22 @@ Apply this skill to **any and all files being modernized** from COBOL into Java,
 4. Translate **behavior only** — same edge cases, rounding, and control flow. Do not invent business rules.
 5. Write the modern module at the path the user/job specifies (typically beside the source under `jobs/<slug>/`).
 6. Obey the project **copyright-headers** rule: upon creating a new file in the target language, add a Copyright header at the top of the file, and port over any comments in the header that may exist in the original file that is being modified.
-7. Prefer clear names when intent is obvious; preserve numeric precision explicitly (e.g. `Decimal` / `BigDecimal` for money).
-8. **After** the modernized source(s) exist, create pytest unit tests (see below), then run them and fix failures before finishing.
+7. Prefer clear names when intent is obvious.
+8. **Money / currency precision (required):**
+   - **Python** — use `decimal.Decimal` (never `float` for money).
+   - **Java** — use `java.math.BigDecimal` (never `float` / `double` for money).
+   - **C#** — use `decimal` (never `float` / `double` for money).
+9. **After** the modernized source(s) exist, create pytest unit tests (see below), then run them and fix failures before finishing.
+
+## Money types by language
+
+| Target | Type | Avoid |
+|--------|------|--------|
+| Python | `Decimal` | `float` |
+| Java | `BigDecimal` | `float`, `double` |
+| C# | `decimal` | `float`, `double` |
+
+Apply this to balances, fees, rates, and any COBOL `PIC …V99` (or similar) money fields. Match COBOL rounding behavior as closely as practical (e.g. quantize / set scale explicitly).
 
 ## Pytest (after every Python modernization)
 
@@ -40,6 +54,7 @@ For **Java** / **C#** targets, still modernize + copyright headers; add a minima
 ## Anti-patterns
 
 - Do not “improve” fee/interest/min-balance formulas.
+- Do not use binary floating point for currency (`float` / `double`).
 - Do not skip Copyright headers (see project rule).
 - Do not ship Python modernizations without pytest coverage and a green `pytest` run.
 - Do not add unrelated frameworks beyond pytest for Python demos unless asked.
