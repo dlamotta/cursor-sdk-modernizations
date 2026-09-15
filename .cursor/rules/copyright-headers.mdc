@@ -1,0 +1,32 @@
+---
+description: >-
+  Require a neutral Copyright header on every new modernized source file, and
+  port header comments from the original COBOL.
+globs: "**/*.{py,java,cs,cbl,cob}"
+alwaysApply: false
+---
+
+# Copyright headers on modernized files
+
+Upon creating a new file in the target language (Java, Python, or C#), add a Copyright header at the top of the file, and port over any comments in the header that may exist in the original file that is being modified.
+
+Apply this to **every** modernized output, not only the first file in a job.
+
+## Requirements
+
+- Start every new Java, Python, or C# module with a **neutral Copyright** header using that language’s comment syntax.
+- Use exactly this rights line (current year), unless the COBOL header already names a rights holder — then keep **that** name, do not invent one:
+
+  `Copyright (c) <YEAR>. All rights reserved.`
+
+- **Do not invent** company, product, or org names (no SpacexAI, demo banks, etc.) when the COBOL header does not supply one.
+- **Port** COBOL header / banner comments (`*` lines above IDENTIFICATION, PROGRAM-ID notes) into the new header — do not drop legacy intent.
+- Also include a provenance line: `Modernized from <SOURCE> (PROGRAM-ID <ID>).`
+
+## Comment shapes
+
+**Python** — `#` lines  
+**Java** — block `/* … */`  
+**C#** — `//` lines  
+
+Order: Copyright line → Modernized from … → ported COBOL header lines.
