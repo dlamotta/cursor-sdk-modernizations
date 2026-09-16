@@ -26,7 +26,7 @@ Apply this skill to **any and all files being modernized** from COBOL into Java,
    - **Python** — use `decimal.Decimal` (never `float` for money).
    - **Java** — use `java.math.BigDecimal` (never `float` / `double` for money).
    - **C#** — use `decimal` (never `float` / `double` for money).
-9. **After** the modernized source(s) exist, create pytest unit tests (see below), then run them and fix failures before finishing.
+9. **After** all modernized source(s) exist, create pytest unit tests for every new Python module (see below). **At the end of the modernization**, run **every** generated pytest file and fix failures before finishing. Do not skip a generated test file.
 
 ## Money types by language
 
@@ -45,9 +45,10 @@ When the target is **Python** (or any new `.py` was produced):
 1. For **each** new modernized `.py` module, add a matching pytest file next to it (e.g. `feecalc.py` → `test_feecalc.py` in the same `jobs/<slug>/` directory).
 2. Cover the COBOL-visible behavior (happy path + the important edge cases from the legacy logic). Do not invent business rules beyond the COBOL.
 3. Prefer plain `pytest` + assertions; use `Decimal` where the module uses money/precision.
-4. Run the tests from the workspace, e.g. `pytest jobs/<slug> -q` (or the paths you wrote).
-5. If tests fail, fix the implementation or tests until they pass — still without changing the COBOL business rules.
-6. Do this for **every** modernized Python file in the job, not only one.
+4. Do this for **every** modernized Python file in the job, not only one.
+5. **End of modernization (required):** after all modules and tests are written, run **every generated pytest file** in one invocation, e.g. `pytest jobs/<slug>/test_*.py -q` (or pass each `test_*.py` path you wrote). Do not finish without executing all of them.
+6. If tests fail, fix the implementation or tests until they pass — still without changing the COBOL business rules. Re-run **all** generated pytest files after fixes, not only the failing file.
+7. In the one-line job summary, report how many pytest **files** ran (one `test_*.py` per module) — not pytest’s collected test-function count.
 
 For **Java** / **C#** targets, still modernize + copyright headers; add a minimal unit test project/file only if the user asks (pytest is Python-specific).
 
@@ -56,5 +57,5 @@ For **Java** / **C#** targets, still modernize + copyright headers; add a minima
 - Do not “improve” fee/interest/min-balance formulas.
 - Do not use binary floating point for currency (`float` / `double`).
 - Do not skip Copyright headers (see project rule).
-- Do not ship Python modernizations without pytest coverage and a green `pytest` run.
+- Do not ship Python modernizations without pytest coverage and a green run of **every** generated pytest file at the end.
 - Do not add unrelated frameworks beyond pytest for Python demos unless asked.
